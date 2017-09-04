@@ -20,13 +20,33 @@ function something_ls-remote () {
     download_page | extract_links | extract_versions
 }
 
+function download_source_code {
+    wget -P $BUILD_TEMP_DIR $SOURCE_CODE_URL
+}
+
+function decompress_source_code {
+    tar zxfv $BUILD_TEMP_DIR/$SOURCE_FILE_NAME.tgz -C $BUILD_TEMP_DIR
+}
+
+function compile_and_install_python {
+    cd $BUILD_TEMP_DIR/$SOURCE_FILE_NAME
+    ./configure --prefix=$DESTINATION_DIR_ABSOLUTE
+    make -j8 && make install
+}
+
 function something_install(){
     BUILD_TEMP_DIR=./downloads
+    DESTINATION_DIR=./python
     mkdir -p $BUILD_TEMP_DIR 
     SOURCE_CODE_URL=$(download_page | extract_links | grep "$1\.tgz")
     SOURCE_FILE_NAME=$(echo $SOURCE_CODE_URL | extract_filename)
-    wget -P $BUILD_TEMP_DIR $SOURCE_CODE_URL
-    tar zxfv $BUILD_TEMP_DIR/$SOURCE_FILE_NAME.tgz -C $BUILD_TEMP_DIR
+    download_source_code
+    decompress_source_code
+    mkdir -p $DESTINATION_DIR/$SOURCE_FILE_NAME
+    find $BUILD_TEMP_DIR -type d | xargs chmod 0755
+    DESTINATION_DIR_ABSOLUTE=$( cd $DESTINATION_DIR/$SOURCE_FILE_NAME; pwd )
+    ( compile_and_install_python )
+    echo "Install Success"
 }
 
 function something_help () {
