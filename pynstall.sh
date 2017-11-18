@@ -82,7 +82,7 @@ function create_virtual_env {
 function load_names {
     SOURCE_CODE_URL=$(download_page | extract_links | grep "$1\.tgz")
     COMPLETE_VERSION_NAME=$(echo $SOURCE_CODE_URL | get_full_version_name)
-    PYTHON_VERSION_PATH=$( realpath $INSTALL_DIR/$COMPLETE_VERSION_NAME)
+    PYTHON_VERSION_PATH=$( realpath -m $INSTALL_DIR/$COMPLETE_VERSION_NAME)
 }
 
 function install_local_python {
@@ -97,7 +97,7 @@ function pynstall_ls-remote {
 }
 
 function pynstall_ls {
-    ls -d $INSTALL_DIR/Python*
+    ls -d $INSTALL_DIR/Python* || echo ""
 }
 
 function pynstall_install {
